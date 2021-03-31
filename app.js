@@ -4,7 +4,10 @@ const app = express();
 
 // DB
 const mongoose = require('mongoose');
-const MONGODB_URI = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}/${process.env.DB_COLLECITON}?retryWrites=true&w=majority`;
+const MONGODB_URI = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}/${process.env.DB_COLLECTION}?retryWrites=true&w=majority`;
+
+// body parser
+app.use(express.json());
 
 // routes
 const userRoute = require('./routes/user-route');
@@ -19,6 +22,15 @@ app.use((req, res, next) => {
 
 // set routes
 app.use('/user', userRoute);
+
+// error route
+app.use((error, req, res, next) => {
+    console.log('Error!! ', error);
+    const code = error.statusCode || 500;
+    const message = error.message;
+    const data = error.data;
+    res.status(code).json({ message: message, data: data });
+});
 
 const connect = async () => {
     try {
